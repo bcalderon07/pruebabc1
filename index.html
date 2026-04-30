@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UAPI — Dashboard de Consistencia | ENDE DEORURO S.A. 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2330;
+  --bg4: #21262d;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #484f58;
+  --accent: #2563eb;
+  --accent2: #1d4ed8;
+  --red: #ef4444;
+  --red-bg: rgba(239,68,68,0.12);
+  --red-border: rgba(239,68,68,0.3);
+  --amber: #f59e0b;
+  --amber-bg: rgba(245,158,11,0.12);
+  --amber-border: rgba(245,158,11,0.3);
+  --green: #22c55e;
+  --green-bg: rgba(34,197,94,0.12);
+  --green-border: rgba(34,197,94,0.3);
+  --blue: #3b82f6;
+  --blue-bg: rgba(59,130,246,0.12);
+  --blue-border: rgba(59,130,246,0.3);
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── BACKGROUND TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(37,99,235,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%, rgba(99,37,235,0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LAYOUT ── */
+.shell { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 0 24px 60px; }
+
+/* ── TOPBAR ── */
+.topbar {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  position: sticky;
+  top: 0;
+  background: rgba(13,17,23,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 100;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.topbar-logo {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+.topbar-org { font-size: 12px; color: var(--text2); }
+.topbar-org strong { color: var(--text); font-weight: 500; display: block; font-size: 13px; }
+.topbar-meta {
+  display: flex; align-items: center; gap: 8px;
+}
+.chip {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.chip-blue { background: var(--blue-bg); border-color: var(--blue-border); color: #93c5fd; }
+.chip-green { background: var(--green-bg); border-color: var(--green-border); color: #86efac; }
+
+/* ── HERO ── */
+.hero {
+  padding: 40px 0 36px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.hero-title em { font-style: italic; font-weight: 300; color: var(--text2); }
+.hero-sub {
+  font-size: 14px;
+  color: var(--text2);
+  max-width: 600px;
+}
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 20px;
+}
+.meta-tag {
+  padding: 4px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--text2);
+}
+.meta-tag span { color: var(--text); font-weight: 500; }
+
+/* ── KPI GRID ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.kpi-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.kpi-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.kpi-card.kpi-total::before { background: var(--blue); }
+.kpi-card.kpi-alerta::before { background: var(--red); }
+.kpi-card.kpi-advertencia::before { background: var(--amber); }
+.kpi-card.kpi-consistente::before { background: var(--green); }
+.kpi-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.kpi-value { font-family: var(--font-display); font-size: 40px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+.kpi-card.kpi-total .kpi-value { color: var(--blue); }
+.kpi-card.kpi-alerta .kpi-value { color: var(--red); }
+.kpi-card.kpi-advertencia .kpi-value { color: var(--amber); }
+.kpi-card.kpi-consistente .kpi-value { color: var(--green); }
+.kpi-desc { font-size: 12px; color: var(--text2); }
+
+/* ── SECTION ── */
+.section { margin-bottom: 40px; }
+.section-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.section-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+}
+
+/* ── TWO-COL ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ── INDICATOR CARD ── */
+.ind-group {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.ind-group-header {
+  padding: 12px 16px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.ind-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.ind-row:last-child { border-bottom: none; }
+.ind-row:hover { background: rgba(255,255,255,0.02); }
+.ind-name { font-size: 13px; font-weight: 400; }
+.ind-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: right;
+  white-space: nowrap;
+}
+.ind-bar-wrap {
+  width: 80px;
+  height: 4px;
+  background: var(--bg4);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ind-bar { height: 100%; border-radius: 2px; }
+.badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  border: 1px solid;
+}
+.badge-green { background: var(--green-bg); border-color: var(--green-border); color: #86efac; }
+.badge-amber { background: var(--amber-bg); border-color: var(--amber-border); color: #fcd34d; }
+.badge-red   { background: var(--red-bg);   border-color: var(--red-border);   color: #fca5a5; }
+.badge-gray  { background: rgba(255,255,255,0.06); border-color: var(--border2); color: var(--text2); }
+
+/* ── ALERT CARDS ── */
+.alert-list { display: flex; flex-direction: column; gap: 10px; }
+.alert-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid;
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.alert-card.alerta {
+  background: var(--red-bg);
+  border-color: var(--red-border);
+}
+.alert-card.advertencia {
+  background: var(--amber-bg);
+  border-color: var(--amber-border);
+}
+.alert-card-head {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 6px;
+}
+.alert-icon {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.alert-card.alerta .alert-icon { background: var(--red); color: #fff; }
+.alert-card.advertencia .alert-icon { background: var(--amber); color: #000; }
+.alert-level {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.alert-card.alerta .alert-level { color: #fca5a5; }
+.alert-card.advertencia .alert-level { color: #fcd34d; }
+.alert-title {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.alert-card.alerta .alert-title { color: #fecaca; }
+.alert-card.advertencia .alert-title { color: #fef08a; }
+.alert-body {
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.alert-card.alerta .alert-body { color: #fca5a5; }
+.alert-card.advertencia .alert-body { color: #fde68a; }
+.alert-tag {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+}
+.alert-card.alerta .alert-tag { background: rgba(239,68,68,0.2); color: #fca5a5; }
+.alert-card.advertencia .alert-tag { background: rgba(245,158,11,0.2); color: #fcd34d; }
+
+/* ── CHART: HORIZONTAL BARS ── */
+.chart-container {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.chart-bar-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 40px;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.chart-bar-row:last-child { margin-bottom: 0; }
+.chart-bar-label { font-size: 12.5px; color: var(--text2); text-align: right; }
+.chart-bar-track {
+  height: 28px;
+  background: var(--bg4);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.chart-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  font-family: var(--font-mono);
+  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
+}
+.chart-bar-count { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--text); }
+
+/* ── GAUGE TABLE ── */
+.gauge-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.gauge-cell {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  text-align: center;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.gauge-cell:hover { border-color: var(--border2); transform: translateY(-1px); }
+.gauge-name { font-size: 11px; color: var(--text2); margin-bottom: 8px; line-height: 1.3; }
+.gauge-val {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.gauge-track {
+  width: 100%;
+  height: 3px;
+  background: var(--bg4);
+  border-radius: 2px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+.gauge-fill { height: 100%; border-radius: 2px; }
+.gauge-zone { font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.04em; }
+
+/* ── CONCLUSION CARD ── */
+.conclusion-card {
+  background: var(--bg2);
+  border: 1px solid var(--red-border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.conclusion-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--red);
+}
+.conclusion-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #fca5a5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.conclusion-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fecaca;
+  margin-bottom: 10px;
+}
+.contradiction-list { list-style: none; }
+.contradiction-list li {
+  display: flex; gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(239,68,68,0.15);
+  font-size: 12.5px;
+  color: #fca5a5;
+}
+.contradiction-list li:last-child { border-bottom: none; }
+.contradiction-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(239,68,68,0.25);
+  color: #fca5a5;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── CONSISTENT TABLE ── */
+.consist-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.consist-table th {
+  text-align: left;
+  padding: 8px 14px;
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+}
+.consist-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.consist-table tr:last-child td { border-bottom: none; }
+.consist-table tr:hover td { background: rgba(255,255,255,0.02); }
+.consist-table .mono { font-family: var(--font-mono); font-size: 12px; }
+
+/* ── FOOTER ── */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  margin-top: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.footer-note {
+  font-size: 11.5px;
+  color: var(--text3);
+  font-style: italic;
+  max-width: 600px;
+  line-height: 1.6;
+}
+.footer-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); text-align: right; white-space: nowrap; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate { animation: fadeUp 0.5s ease both; }
+.d1 { animation-delay: 0.05s; }
+.d2 { animation-delay: 0.12s; }
+.d3 { animation-delay: 0.19s; }
+.d4 { animation-delay: 0.26s; }
+.d5 { animation-delay: 0.33s; }
+.d6 { animation-delay: 0.40s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .two-col  { grid-template-columns: 1fr; }
+  .gauge-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .gauge-grid { grid-template-columns: repeat(2, 1fr); }
+  .topbar-meta { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="shell" style="display:flex;align-items:center;justify-content:space-between;width:100%;padding-top:0;padding-bottom:0">
+    <div class="topbar-brand">
+      <div class="topbar-logo">UAPI</div>
+      <div class="topbar-org">
+        <strong>AETN — Autoridad de Fiscalización</strong>
+        Unidad de Auditorías Preventivas
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span class="chip chip-blue">Res. N° 298/2022</span>
+      <span class="chip chip-green">Gestión 2025</span>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- ── HERO ── -->
+  <div class="hero animate d1">
+    <div class="hero-eyebrow">Reporte de consistencia de dictamen</div>
+    <h1 class="hero-title">ENDE DEORURO S.A. <em>/ 2025</em></h1>
+    <p class="hero-sub">Evaluación de coherencia entre valores numéricos e interpretaciones de la consultora — Delta Consult Ltda.</p>
+    <div class="hero-meta">
+      <span class="meta-tag">Empresa: <span>Distribuidora de Electricidad ENDE DEORURO S.A.</span></span>
+      <span class="meta-tag">Consultora: <span>Delta Consult Ltda.</span></span>
+      <span class="meta-tag">Dictamen: <span>14 enero 2026</span></span>
+      <span class="meta-tag">Evaluación: <span>23 abril 2026</span></span>
+      <span class="meta-tag">Segmento: <span>Distribución eléctrica</span></span>
+    </div>
+  </div>
+
+  <!-- ── KPI CARDS ── -->
+  <div class="kpi-grid animate d2">
+    <div class="kpi-card kpi-total">
+      <div class="kpi-label">Cobertura</div>
+      <div class="kpi-value">8/8</div>
+      <div class="kpi-desc">indicadores reportados</div>
+    </div>
+    <div class="kpi-card kpi-alerta">
+      <div class="kpi-label">Alertas</div>
+      <div class="kpi-value">2</div>
+      <div class="kpi-desc">ROI + Conclusión global</div>
+    </div>
+    <div class="kpi-card kpi-advertencia">
+      <div class="kpi-label">Advertencias</div>
+      <div class="kpi-value">2</div>
+      <div class="kpi-desc">Prueba Ácida + Endeudamiento</div>
+    </div>
+    <div class="kpi-card kpi-consistente">
+      <div class="kpi-label">Consistentes</div>
+      <div class="kpi-value">5</div>
+      <div class="kpi-desc">sin observaciones</div>
+    </div>
+  </div>
+
+  <!-- ── INDICADORES ── -->
+  <div class="section animate d3">
+    <div class="section-header">
+      <h2 class="section-title">Estado de indicadores</h2>
+      <span class="section-num">II</span>
+    </div>
+    <div class="two-col">
+
+      <!-- EFICIENCIA -->
+      <div class="ind-group">
+        <div class="ind-group-header">Indicadores de eficiencia</div>
+
+        <div class="ind-row">
+          <span class="ind-name">Período de Cobro</span>
+          <span class="ind-value">39,11 días</span>
+          <div class="ind-bar-wrap"><div class="ind-bar" style="width:65%;background:var(--amber)"></div></div>
+          <span class="badge badge-amber">Amarillo</span>
+        </div>
+        <div class="ind-row">
+          <span class="ind-name">Rotación de Activos</span>
+          <span class="ind-value">88,70 %</span>
+          <div class="ind-bar-wrap"><div class="ind-bar" style="width:100%;background:var(--green)"></div></div>
+          <span class="badge badge-green">Verde</span>
+        </div>
+        <div class="ind-row" style="background:var(--amber-bg)">
+          <span class="ind-name">Endeudamiento ⚠</span>
+          <span class="ind-value">104,86 %</span>
+          <div class="ind-bar-wrap"><div class="ind-bar" style="width:52%;background:var(--amber)"></div></div>
+          <span class="badge badge-amber">Amarillo</span>
+        </div>
+        <div class="ind-row" style="background:var(--amber-bg)">
+          <span class="ind-name">Prueba Ácida ⚠</span>
+          <span class="ind-value">0,91x</span>
+          <div class="ind-bar-wrap"><div class="ind-bar" style="width:58%;background:var(--amber)"></div></div>
+          <span class="badge badge-amber">Amarillo</span>
+        </div>
+      </div>
+
+      <!-- EFICACIA -->
+      <div class="ind-group">
+        <div class="ind-group-header">Indicadores de eficacia</div>
+
+        <div class="ind-row">
+          <span class="ind-name">ROA</span>
+          <span class="ind-value">8,80 %</span>
+          <div class="ind-bar-wrap"><div class="ind-bar" style="width:88%;background:var(--green)"></div></div>
+          <span class="badge badge-green">Verde</span>
+        </div>
+        <div class="ind-row">
+          <span class="ind-name">ROE</span>
+          <span class="ind-value">18,02 %</span>
+          <div class="ind-bar-wrap"><div class="ind-bar" style="width:100%;background:var(--green)"></div></div>
+          <span class="badge badge-green">Verde</span>
+        </div>
+        <div class="ind-row" style="background:var(--red-bg)">
+          <span class="ind-name">ROI 🔴</span>
+          <span class="ind-value" style="color:var(--red)">122,54 %</span>
+          <div class="ind-bar-wrap"><div class="ind-bar" style="width:100%;background:var(--red)"></div></div>
+          <span class="badge badge-red">ALERTA</span>
+        </div>
+        <div class="ind-row">
+          <span class="ind-name">Margen Bruto</span>
+          <span class="ind-value">40,65 %</span>
+          <div class="ind-bar-wrap"><div class="ind-bar" style="width:100%;background:var(--green)"></div></div>
+          <span class="badge badge-green">Verde</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── VISUALIZACIÓN: GAUGE CELLS ── -->
+  <div class="section animate d4">
+    <div class="section-header">
+      <h2 class="section-title">Posición respecto a umbrales regulatorios</h2>
+      <span class="section-num">III</span>
+    </div>
+    <div class="gauge-grid">
+
+      <div class="gauge-cell">
+        <div class="gauge-name">Período de Cobro</div>
+        <div class="gauge-val" style="color:var(--amber)">39,11</div>
+        <div class="gauge-track"><div class="gauge-fill" style="width:65%;background:var(--amber)"></div></div>
+        <div class="gauge-zone" style="color:var(--amber)">AMARILLA · 30–60d</div>
+      </div>
+      <div class="gauge-cell">
+        <div class="gauge-name">Rotación de Activos</div>
+        <div class="gauge-val" style="color:var(--green)">88,70%</div>
+        <div class="gauge-track"><div class="gauge-fill" style="width:100%;background:var(--green)"></div></div>
+        <div class="gauge-zone" style="color:var(--green)">VERDE · &gt;50%</div>
+      </div>
+      <div class="gauge-cell" style="border-color:var(--amber-border)">
+        <div class="gauge-name">Endeudamiento ⚠</div>
+        <div class="gauge-val" style="color:var(--amber)">104,86%</div>
+        <div class="gauge-track"><div class="gauge-fill" style="width:52%;background:var(--amber)"></div></div>
+        <div class="gauge-zone" style="color:var(--amber)">AMARILLA · 100–200%</div>
+      </div>
+      <div class="gauge-cell" style="border-color:var(--amber-border)">
+        <div class="gauge-name">Prueba Ácida ⚠</div>
+        <div class="gauge-val" style="color:var(--amber)">0,91x</div>
+        <div class="gauge-track"><div class="gauge-fill" style="width:58%;background:var(--amber)"></div></div>
+        <div class="gauge-zone" style="color:var(--amber)">AMARILLA · 0,7–1,0x</div>
+      </div>
+      <div class="gauge-cell">
+        <div class="gauge-name">ROA</div>
+        <div class="gauge-val" style="color:var(--green)">8,80%</div>
+        <div class="gauge-track"><div class="gauge-fill" style="width:88%;background:var(--green)"></div></div>
+        <div class="gauge-zone" style="color:var(--green)">VERDE · ≥5%</div>
+      </div>
+      <div class="gauge-cell">
+        <div class="gauge-name">ROE</div>
+        <div class="gauge-val" style="color:var(--green)">18,02%</div>
+        <div class="gauge-track"><div class="gauge-fill" style="width:100%;background:var(--green)"></div></div>
+        <div class="gauge-zone" style="color:var(--green)">VERDE · ≥8%</div>
+      </div>
+      <div class="gauge-cell" style="border-color:var(--red-border)">
+        <div class="gauge-name">ROI 🔴 ALERTA</div>
+        <div class="gauge-val" style="color:var(--red)">122,54%</div>
+        <div class="gauge-track"><div class="gauge-fill" style="width:100%;background:var(--red)"></div></div>
+        <div class="gauge-zone" style="color:var(--red)">VERDE* · interp. incorrecta</div>
+      </div>
+      <div class="gauge-cell">
+        <div class="gauge-name">Margen Bruto</div>
+        <div class="gauge-val" style="color:var(--green)">40,65%</div>
+        <div class="gauge-track"><div class="gauge-fill" style="width:100%;background:var(--green)"></div></div>
+        <div class="gauge-zone" style="color:var(--green)">VERDE · &gt;20%</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── ALERTAS + DISTRIBUCIÓN ── -->
+  <div class="section animate d5">
+    <div class="section-header">
+      <h2 class="section-title">Alertas y advertencias</h2>
+      <span class="section-num">IV</span>
+    </div>
+    <div class="two-col">
+
+      <div class="alert-list">
+        <div class="alert-card alerta">
+          <div class="alert-card-head">
+            <div class="alert-icon">!</div>
+            <span class="alert-level">Alerta — Contradicción directa</span>
+          </div>
+          <div class="alert-title">ROI — Retorno sobre la Inversión</div>
+          <div class="alert-body">Valor: 122,54% (zona verde). La consultora interpreta que la inversión "no tiene una buena rentabilidad". Inversión completa del sentido del resultado.</div>
+          <span class="alert-tag">+ omisión: "Inversión" no definida en Manual SSDE 129/97</span>
+        </div>
+
+        <div class="alert-card alerta">
+          <div class="alert-card-head">
+            <div class="alert-icon">!</div>
+            <span class="alert-level">Alerta — Contradicción global</span>
+          </div>
+          <div class="alert-title">Conclusión global del dictamen</div>
+          <div class="alert-body">Califica la empresa como de "Estados Financieros estables" sin cuentas "alarmantes", contradiciendo la Prueba Ácida (0,91x) y su propia interpretación del ROI.</div>
+          <span class="alert-tag">2 contradicciones específicas identificadas</span>
+        </div>
+
+        <div class="alert-card advertencia">
+          <div class="alert-card-head">
+            <div class="alert-icon" style="background:var(--amber);color:#000">▲</div>
+            <span class="alert-level">Advertencia — Omisión metodológica</span>
+          </div>
+          <div class="alert-title">Prueba Ácida</div>
+          <div class="alert-body">Interpretación correcta en dirección (0,91x, zona amarilla). Omite que "Inventarios" no está definida en el Manual SSDE 129/97.</div>
+          <span class="alert-tag">Advertencia obligatoria en todo caso</span>
+        </div>
+
+        <div class="alert-card advertencia">
+          <div class="alert-card-head">
+            <div class="alert-icon" style="background:var(--amber);color:#000">▲</div>
+            <span class="alert-level">Advertencia — Omisión metodológica</span>
+          </div>
+          <div class="alert-title">Endeudamiento</div>
+          <div class="alert-body">Interpretación correcta en dirección (104,86%, zona amarilla). Omite que el indicador mezcla deuda financiera con deuda comercial al superar 100%.</div>
+          <span class="alert-tag">Advertencia obligatoria al superar 100%</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- DISTRIBUCIÓN -->
+        <div class="chart-container">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:18px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.06em">Distribución de resultados</div>
+          <div class="chart-bar-row">
+            <div class="chart-bar-label" style="color:var(--red)">Alertas</div>
+            <div class="chart-bar-track">
+              <div class="chart-bar-fill" style="width:40%;background:var(--red)" id="bar-alerta">2</div>
+            </div>
+            <div class="chart-bar-count" style="color:var(--red)">2</div>
+          </div>
+          <div class="chart-bar-row">
+            <div class="chart-bar-label" style="color:var(--amber)">Advertencias</div>
+            <div class="chart-bar-track">
+              <div class="chart-bar-fill" style="width:40%;background:var(--amber)" id="bar-adv">2</div>
+            </div>
+            <div class="chart-bar-count" style="color:var(--amber)">2</div>
+          </div>
+          <div class="chart-bar-row">
+            <div class="chart-bar-label" style="color:var(--green)">Consistentes</div>
+            <div class="chart-bar-track">
+              <div class="chart-bar-fill" style="width:100%;background:var(--green)" id="bar-cons">5</div>
+            </div>
+            <div class="chart-bar-count" style="color:var(--green)">5</div>
+          </div>
+        </div>
+
+        <!-- CONCLUSIÓN GLOBAL -->
+        <div class="conclusion-card">
+          <div class="conclusion-label">Coherencia de la conclusión global</div>
+          <div class="conclusion-title">Alerta de contradicción global — dictamen p. 7 y p. 14</div>
+          <ul class="contradiction-list">
+            <li>
+              <span class="contradiction-num">1</span>
+              <span>Prueba Ácida 0,91x: la consultora advierte dificultades de liquidez en el cuerpo, pero la conclusión dice que no hay cuentas "alarmantes o fuera de lo normal".</span>
+            </li>
+            <li>
+              <span class="contradiction-num">2</span>
+              <span>ROI: la propia consultora calificó el resultado como de "mala rentabilidad", pero la conclusión global describe la empresa como estable con "tendencia positiva gestión tras gestión".</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CONSISTENTES ── -->
+  <div class="section animate d6">
+    <div class="section-header">
+      <h2 class="section-title">Indicadores consistentes</h2>
+      <span class="section-num">V</span>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+      <table class="consist-table">
+        <thead>
+          <tr>
+            <th>Indicador</th>
+            <th>Valor</th>
+            <th>Zona</th>
+            <th>Confirmación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Período de Cobro</td>
+            <td class="mono">39,11 días</td>
+            <td><span class="badge badge-amber">Amarillo</span></td>
+            <td style="font-size:12px;color:var(--text2)">Interpretación coherente con el umbral. Sin advertencia obligatoria.</td>
+          </tr>
+          <tr>
+            <td>Rotación de Activos</td>
+            <td class="mono">88,70 %</td>
+            <td><span class="badge badge-green">Verde</span></td>
+            <td style="font-size:12px;color:var(--text2)">Calificado como eficiente. Sin comparación entre segmentos. Sin advertencia.</td>
+          </tr>
+          <tr>
+            <td>ROA</td>
+            <td class="mono">8,80 %</td>
+            <td><span class="badge badge-green">Verde</span></td>
+            <td style="font-size:12px;color:var(--text2)">Calificado como rentabilidad aceptable para empresa regulada. Sin advertencia.</td>
+          </tr>
+          <tr>
+            <td>ROE</td>
+            <td class="mono">18,02 %</td>
+            <td><span class="badge badge-green">Verde</span></td>
+            <td style="font-size:12px;color:var(--text2)">Nivel atractivo con reconocimiento del riesgo de apalancamiento. Sin advertencia.</td>
+          </tr>
+          <tr>
+            <td>Margen Bruto</td>
+            <td class="mono">40,65 %</td>
+            <td><span class="badge badge-green">Verde</span></td>
+            <td style="font-size:12px;color:var(--text2)">Margen moderado acorde a actividad regulada. Sin advertencia condicional activada.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <p class="footer-note">Este dashboard es un insumo de evaluación interna de la UAPI — AETN. Las alertas y advertencias identificadas no constituyen una observación formal hasta que el evaluador humano las valide y complete el juicio profesional correspondiente.</p>
+    <div class="footer-meta">
+      AETN — UAPI<br>
+      Res. N° 298/2022<br>
+      Gestión 2025
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const bars = document.querySelectorAll('.chart-bar-fill, .ind-bar, .gauge-fill');
+  bars.forEach(b => {
+    const w = b.style.width;
+    b.style.width = '0%';
+    setTimeout(() => { b.style.transition = 'width 1s cubic-bezier(0.22,1,0.36,1)'; b.style.width = w; }, 200);
+  });
+  const tracks = document.querySelectorAll('.ind-bar-wrap .ind-bar');
+  tracks.forEach((b, i) => {
+    const w = b.style.width;
+    b.style.width = '0%';
+    setTimeout(() => { b.style.transition = 'width 0.8s cubic-bezier(0.22,1,0.36,1)'; b.style.width = w; }, 300 + i * 60);
+  });
+});
+</script>
+</body>
+</html>
